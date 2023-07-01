@@ -1,6 +1,6 @@
 {
-  "name": "goto-error",
-  "displayName": "goto-error",
+  "name": "goto-error-hover",
+  "displayName": "goto-error-hover",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -14,8 +14,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "goto-error.helloWorld",
-        "title": "Hello World"
+        "command": "goto-error-hover.next",
+        "title": "Goto-error: Next"
+      },
+      {
+        "command": "goto-error-hover.prev",
+        "title": "Goto-error: Prev"
       }
     ]
   },

@@ -102,97 +102,30 @@ export function activate(context: vscode.ExtensionContext) {
 
     lastPosition = { position: next.range.start, uri: editor.document.uri };
     editor.selection = new vscode.Selection(next.range.start, next.range.start);
-    await vscode.commands.executeCommand("closeMarkersNavigation"); // Issue #3
-    await vscode.commands.executeCommand("editor.action.marker.next");
+    vscode.commands.executeCommand("closeMarkersNavigation"); // Issue #3
+    vscode.commands.executeCommand(
+      "editor.action.goToLocations",
+      lastPosition.uri,
+      [lastPosition.position]
+    );
+    vscode.commands.executeCommand("editor.action.showHover");
     return true;
   };
 
-  const gotoNextMarkerInFiles = async (filter: vscode.DiagnosticSeverity[]) => {
-    // If there is an error after the cursor in the file, select it.
-    if (await gotoMarkerInFile(filter, "next", false)) {
-      return;
-    }
-
-    // Get the first error in the next document.
-    const filesSorted = vscode.languages
-      .getDiagnostics()
-      .filter((file) => {
-        file[1] = file[1].filter((d) => filter.includes(d.severity));
-        return file[1].length > 0;
-      })
-      .sort(([uri1], [uri2]) =>
-        uri1.toString() < uri2.toString()
-          ? -1
-          : uri1.toString() === uri2.toString()
-          ? 0
-          : 1
-      );
-    if (filesSorted.length === 0) {
-      return;
-    }
-    if (
-      filesSorted.length === 1 &&
-      filesSorted[0][0].toString() ===
-        vscode.window.activeTextEditor?.document.uri.toString()
-    ) {
-      // Fix: When there is only one error location in all files, multiple command calls will select a non-error marker.
-      await gotoMarkerInFile(filter, "next", true);
-      return;
-    }
-
-    const currentDocumentUri =
-      vscode.window.activeTextEditor?.document.uri.toString();
-    const activeFileIndex = filesSorted.findIndex(
-      ([uri]) => uri.toString() === currentDocumentUri
-    );
-    const [uri, diagnostics] =
-      filesSorted[
-        activeFileIndex === -1 ? 0 : (activeFileIndex + 1) % filesSorted.length
-      ];
-    const next = getMarkersSorted(diagnostics)[0];
-
-    // Open the document and select the error.
-    lastPosition = { position: next.range.start, uri };
-    const editor = await vscode.window.showTextDocument(
-      await vscode.workspace.openTextDocument(uri)
-    );
-    editor.selection = new vscode.Selection(next.range.start, next.range.start);
-    await vscode.commands.executeCommand("closeMarkersNavigation"); // Issue #3
-    await vscode.commands.executeCommand("editor.action.marker.nextInFiles");
-  };
-
   context.subscriptions.push(
-    vscode.commands.registerCommand("go-to-next-error.next.error", () =>
-      gotoMarkerInFile([vscode.DiagnosticSeverity.Error], "next")
-    ),
-    vscode.commands.registerCommand("go-to-next-error.prev.error", () =>
-      gotoMarkerInFile([vscode.DiagnosticSeverity.Error], "prev")
-    ),
-    vscode.commands.registerCommand("go-to-next-error.nextInFiles.error", () =>
-      gotoNextMarkerInFiles([vscode.DiagnosticSeverity.Error])
-    ),
-    vscode.commands.registerCommand("go-to-next-error.next.warning", () =>
+    vscode.commands.registerCommand("goto-error.next", () =>
       gotoMarkerInFile(
         [vscode.DiagnosticSeverity.Error, vscode.DiagnosticSeverity.Warning],
         "next"
       )
     ),
-    vscode.commands.registerCommand("go-to-next-error.prev.warning", () =>
+    vscode.commands.registerCommand("goto-error.prev", () =>
       gotoMarkerInFile(
         [vscode.DiagnosticSeverity.Error, vscode.DiagnosticSeverity.Warning],
         "prev"
       )
-    ),
-    vscode.commands.registerCommand(
-      "go-to-next-error.nextInFiles.warning",
-      () =>
-        gotoNextMarkerInFiles([
-          vscode.DiagnosticSeverity.Error,
-          vscode.DiagnosticSeverity.Warning,
-        ])
     )
   );
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
