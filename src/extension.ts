@@ -113,13 +113,13 @@ export function activate(context: vscode.ExtensionContext) {
   };
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("goto-error.next", () =>
+    vscode.commands.registerCommand("goto-error-hover.next", () =>
       gotoMarkerInFile(
         [vscode.DiagnosticSeverity.Error, vscode.DiagnosticSeverity.Warning],
         "next"
       )
     ),
-    vscode.commands.registerCommand("goto-error.prev", () =>
+    vscode.commands.registerCommand("goto-error-hover.prev", () =>
       gotoMarkerInFile(
         [vscode.DiagnosticSeverity.Error, vscode.DiagnosticSeverity.Warning],
         "prev"
