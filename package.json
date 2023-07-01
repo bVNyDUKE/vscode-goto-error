@@ -15,11 +15,11 @@
     "commands": [
       {
         "command": "goto-error-hover.next",
-        "title": "Goto-error: Next"
+        "title": "Hover next error: Next"
       },
       {
         "command": "goto-error-hover.prev",
-        "title": "Goto-error: Prev"
+        "title": "Hover prev error: Prev"
       }
     ]
   },

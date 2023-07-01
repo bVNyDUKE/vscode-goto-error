@@ -103,6 +103,10 @@ export function activate(context: vscode.ExtensionContext) {
     lastPosition = { position: next.range.start, uri: editor.document.uri };
     editor.selection = new vscode.Selection(next.range.start, next.range.start);
     vscode.commands.executeCommand("closeMarkersNavigation"); // Issue #3
+    vscode.commands.executeCommand("revealLine", {
+      lineNumber: lastPosition.position.line,
+      at: "center",
+    });
     vscode.commands.executeCommand(
       "editor.action.goToLocations",
       lastPosition.uri,
